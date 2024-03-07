@@ -1,0 +1,32 @@
+name: updateStock
+
+on:
+#  push:
+#    branches:
+#      - master
+  schedule:
+    - cron: '0 5 * * *' # GMT+8 13:00
+  workflow_dispatch: # add manually button
+
+jobs:
+  start:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f cronjob/requirements.txt ]; then pip install -r cronjob/requirements.txt; fi
+
+      - name: Run Cronjob File
+        run: |
+          python cronjob/cronjob.py
